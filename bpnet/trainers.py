@@ -1,5 +1,6 @@
 from kipoi_utils.external.flatten_json import flatten
 from bpnet.utils import write_json, dict_prefix_key
+from bpnet import swag_callback
 from keras.callbacks import EarlyStopping, CSVLogger, TensorBoard
 from collections import OrderedDict
 import os
@@ -42,6 +43,7 @@ class SeqModelTrainer:
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
         self.ckp_file = f"{self.output_dir}/model.h5"
+        self.swag_prefix = f"{self.output_dir}/swag"
         if os.path.exists(self.ckp_file):
             raise ValueError(f"model.h5 already exists in {self.output_dir}")
         self.history_path = f"{self.output_dir}/history.csv"
@@ -97,6 +99,8 @@ class SeqModelTrainer:
             wcp = [WandbCallback(save_model=False)]  # we save the model using ModelCheckpoint
         else:
             wcp = []
+            
+        sc = [swag_callback.SWAGCallback(output_prefix=self.swag_prefix, rank=150)] 
 
         # train the model
         if len(valid_dataset) == 0:
@@ -125,7 +129,7 @@ class SeqModelTrainer:
                     restore_best_weights=True
                 ),
                 CSVLogger(self.history_path)
-            ] + tb + wcp
+            ] + tb + wcp + sc
         )
         self.model.save(self.ckp_file)
 
