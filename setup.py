@@ -15,7 +15,7 @@ requirements = [
     # ml
     "gin-config",
     "keras==2.2.4",
-    "scikit-learn",
+    "scikit-learn==0.23",
     # "tensorflow",
 
     # numerics

@@ -1,4 +1,4 @@
-name: bpnet-gpu
+name: bpnet-gpu-2
 channels:
 - bioconda
 - pytorch
