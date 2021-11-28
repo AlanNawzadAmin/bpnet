@@ -42,7 +42,7 @@ dependencies:
   - nbclient==0.4.0
 
   # ML & numerics
-  - tensorflow-gpu==1.7 #for gpu
+  - tensorflow-gpu==1.9 #for gpu
 
   # bpnet package
   - .[dev,extras]  # install the local basepair package. All the other required pip packages are specified in the setup.py

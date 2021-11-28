@@ -20,7 +20,7 @@ class SWAGCallback(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         self.mean = [((epoch)*prev + curr)/(epoch+1) for prev, curr in zip(self.mean, self.model.get_weights())]
-        self.moments = [((epoch)*prev + (curr-mean)**2)/(epoch+1) for prev, mean, curr in zip(self.moments, self.mean, self.model.get_weights())]
+        self.moments = [((epoch)*prev + curr**2)/(epoch+1) for prev, mean, curr in zip(self.moments, self.mean, self.model.get_weights())]
         self.cols = self.cols + [[(curr-mean) for mean, curr in zip(self.mean, self.model.get_weights())]]
         if len(self.cols) > self.rank:
             self.cols = self.cols[1:]
