@@ -27,6 +27,7 @@ requirements = [
 
     # Plotting
     "matplotlib>=3.0.2",
+    "matplotlib-inline",
     "plotnine",
     "seaborn",
 
