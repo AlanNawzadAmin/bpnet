@@ -64,7 +64,7 @@ ScalarHead.net = @GlobalAvgPoolFCN()
 GlobalAvgPoolFCN.n_tasks = %tracks_per_task
 GlobalAvgPoolFCN.n_splines = 0
 GlobalAvgPoolFCN.batchnorm = %batchnorm
-ScalarHead.loss = 'mse'
+ScalarHead.loss = %count_loss
 ScalarHead.loss_weight = %lambda
 ScalarHead.bias_input = 'bias/{task}/counts'
 ScalarHead.use_bias = %use_bias
@@ -121,6 +121,7 @@ n_dil_layers = 9
 train.batch_size = 128
 batchnorm = False
 seq_width = 1000
+count_loss = 'exp_poisson'
 # TODO - mention the usage of macros
 
 # TODO - important parameters you might want to adjust

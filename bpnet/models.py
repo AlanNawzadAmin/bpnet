@@ -20,6 +20,7 @@ def bpnet_model(tasks,
                 b_loss_weight=1,
                 c_loss_weight=1,
                 p_loss_weight=1,
+                poisson_loss=True,
                 c_splines=0,
                 b_splines=20,
                 merge_profile_reg=False,
@@ -45,6 +46,7 @@ def bpnet_model(tasks,
       b_loss_weight: binary classification weight
       c_loss_weight: total count regression weight
       p_loss_weight: profile regression weight
+      poisson_loss: use poisson loss for counts
       c_splines: number of splines to use in the binary classification output head
       p_splines: number of splines to use in the profile regression output head (0=None)
       merge_profile_reg: if True, total count and profile prediction will be part of
@@ -66,7 +68,7 @@ def bpnet_model(tasks,
     from bpnet.metrics import BPNetMetricSingleProfile, default_peak_pred_metric
     from bpnet.heads import ScalarHead, ProfileHead
     from bpnet.metrics import ClassificationMetrics, RegressionMetrics
-    from bpnet.losses import multinomial_nll, CountsMultinomialNLL
+    from bpnet.losses import multinomial_nll, CountsMultinomialNLL, PoissonMultinomialNLL
     import bpnet.losses as bloss
     from bpnet.activations import clipped_exp
     from bpnet.functions import softmax
@@ -111,6 +113,10 @@ def bpnet_model(tasks,
                                      metric=profile_metric
                                      ))
         else:
+            if poisson_loss:
+                merge_loss = PoissonMultinomialNLL(c_task_weight=c_loss_weight)
+            else:
+                merge_loss = CountsMultinomialNLL(c_task_weight=c_loss_weight)
             heads.append(ProfileHead(target_name='{task}/profile',
                                      net=DeConv1D(n_tasks=tracks_per_task,
                                                   filters=filters,
@@ -120,7 +126,7 @@ def bpnet_model(tasks,
                                                   batchnorm=batchnorm
                                                   ),
                                      activation=clipped_exp,
-                                     loss=CountsMultinomialNLL(c_task_weight=c_loss_weight),
+                                     loss=merge_loss,
                                      loss_weight=p_loss_weight,
                                      bias_input='bias/{task}/profile',
                                      use_bias=use_bias,
@@ -133,18 +139,19 @@ def bpnet_model(tasks,
 
     # Count regression
     if c_loss_weight > 0:
-        heads.append(ScalarHead(target_name='{task}/counts',
-                                net=GlobalAvgPoolFCN(n_tasks=tracks_per_task,
-                                                     n_splines=c_splines,
-                                                     batchnorm=batchnorm),
-                                activation=None,
-                                loss='mse',
-                                loss_weight=c_loss_weight,
-                                bias_input='bias/{task}/counts',
-                                use_bias=use_bias,
-                                bias_shape=(n_bias_tracks, ),
-                                metric=count_metric,
-                                ))
+        if not merge_profile_reg:
+            heads.append(ScalarHead(target_name='{task}/counts',
+                                    net=GlobalAvgPoolFCN(n_tasks=tracks_per_task,
+                                                         n_splines=c_splines,
+                                                         batchnorm=batchnorm),
+                                    activation=None,
+                                    loss='mse',
+                                    loss_weight=c_loss_weight,
+                                    bias_input='bias/{task}/counts',
+                                    use_bias=use_bias,
+                                    bias_shape=(n_bias_tracks, ),
+                                    metric=count_metric,
+                                    ))
 
     # Binary classification
     if b_loss_weight > 0:

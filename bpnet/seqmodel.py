@@ -11,6 +11,7 @@ from kipoi_utils.data_utils import numpy_collate_concat
 from bpnet.data import nested_numpy_minibatch
 from bpnet.utils import flatten, fnmatch_any, _listify
 from bpnet.functions import mean
+import bpnet.losses as bloss
 import gin
 from gin import config
 import logging
@@ -71,7 +72,10 @@ class SeqModel:
                 bias_inputs += bias_input
                 self.target_names.append(head.get_target(task))
                 self.postproc_fns.append(head.postproc_fn)
-                self.losses.append(head.loss)
+                t_loss = head.loss
+                if isinstance(t_loss, str):
+                    t_loss = bloss.get(t_loss)
+                self.losses.append(t_loss)
                 self.loss_weights.append(head.loss_weight)
 
         # create and compile the model

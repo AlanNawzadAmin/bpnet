@@ -32,6 +32,18 @@ def multinomial_nll(true_counts, logits):
 
     return -tf.reduce_sum(dist.log_prob(true_counts_perm)) / batch_size
 
+@gin.configurable
+def exp_poisson(log_true_counts, log_pred_counts):
+    """Poisson loss except takes log(x+1) as input
+    
+    Args:
+    log_true_counts: observed count values (batch, channels)
+    log_pred: predicted count values (batch, channels)
+    """
+    batch_size = tf.to_float(tf.shape(log_true_counts)[0])
+    true_counts = tf.exp(log_true_counts) - 1
+    pred_counts = tf.exp(log_pred_counts) - 1
+    return tf.reduce_sum(pred_counts - true_counts * tf.log(pred_counts)) / batch_size
 
 @gin.configurable
 class CountsMultinomialNLL:
