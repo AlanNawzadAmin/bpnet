@@ -72,10 +72,10 @@ class SeqModel:
                 bias_inputs += bias_input
                 self.target_names.append(head.get_target(task))
                 self.postproc_fns.append(head.postproc_fn)
-                t_loss = head.loss
-                if isinstance(t_loss, str):
-                    t_loss = bloss.get(t_loss)
-                self.losses.append(t_loss)
+                # t_loss = head.loss
+                # if isinstance(t_loss, str):
+                #     t_loss = bloss.get(t_loss)
+                self.losses.append(head.loss)
                 self.loss_weights.append(head.loss_weight)
 
         # create and compile the model

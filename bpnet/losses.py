@@ -90,6 +90,7 @@ class PoissonMultinomialNLL:
 
 
 AVAILABLE = ["multinomial_nll",
+             "exp_poisson",
              "CountsMultinomialNLL",
              "PoissonMultinomialNLL"]
 
