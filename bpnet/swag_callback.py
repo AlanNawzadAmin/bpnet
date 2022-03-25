@@ -11,9 +11,9 @@ class SWAGCallback(keras.callbacks.Callback):
     """
     def __init__(self, output_prefix, start=160, rank=139):
         # super(EarlyStoppingAtMinLoss, self).__init__()
-        self.mean = 2000*[0.]
+        self.mean = 2000*[np.zeros(2)]
         # best_weights to store the weights at which the minimum loss occurs.
-        self.moments = 2000*[0.]
+        self.moments = 2000*[np.zeros(2)]
         self.rank = rank
         self.start = start
         self.output_prefix = output_prefix
