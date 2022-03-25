@@ -28,6 +28,7 @@ class SWAGCallback(keras.callbacks.Callback):
             self.cols = self.cols[1:]
 
     def on_train_end(self, logs=None):
+        print(self.mean)
         json.dump([p.tolist() for p in self.mean], open(self.output_prefix + '_mean.json', 'w+'))
         diag = [moment - mean**2 for moment, mean in zip(self.moments, self.mean)]
         json.dump([p.tolist() for p in diag], open(self.output_prefix + '_diag.json', 'w+'))
